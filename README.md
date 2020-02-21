@@ -2,6 +2,12 @@
 
 A small tool to show current status of the git repository
 
+## Install
+
+```bash
+go get github.com/sosedoff/git-branches
+```
+
 ## Example
 
 ```bash
