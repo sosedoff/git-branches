@@ -35,7 +35,7 @@ func (info branchInfo) strings() []string {
 		info.name,
 		fmt.Sprintf("%d", info.commitsBehind),
 		fmt.Sprintf("%d", info.commitsAhead),
-		info.lastCommit.String(),
+		info.lastCommit.Format(time.RFC822),
 		info.status(),
 	}
 }
