@@ -50,6 +50,16 @@ func parseBranchInfo(line string) (*branchInfo, error) {
 }
 
 func getBranches() ([]branchInfo, error) {
+	current, err := getHead()
+	if err != nil {
+		return nil, err
+	}
+
+	merged, err := getMergedBranches(current)
+	if err != nil {
+		return nil, err
+	}
+
 	args := []string{
 		"branch",
 		"--list",
@@ -75,10 +85,21 @@ func getBranches() ([]branchInfo, error) {
 		go func(line string, i int) {
 			defer wg.Done()
 
+			if line == current {
+				return
+			}
+
 			info, err := parseBranchInfo(line)
 			if err != nil {
 				fatal(err)
 			}
+
+			for _, b := range merged {
+				if b == info.name {
+					info.merged = true
+				}
+			}
+
 			branches[i] = *info
 
 		}(line, i)
@@ -87,4 +108,34 @@ func getBranches() ([]branchInfo, error) {
 	wg.Wait()
 
 	return branches, nil
+}
+
+func getMergedBranches(current string) ([]string, error) {
+	args := []string{
+		"branch",
+		"--list",
+		"--no-color",
+		`--format="%(refname:lstrip=2)"`,
+		"--merged=" + current,
+	}
+
+	out, err := exec.Command("git", args...).CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	str := strings.TrimSpace(string(out))
+	lines := strings.Split(str, "\n")
+
+	result := []string{}
+	for _, line := range lines {
+		var name string
+		fmt.Sscanf(line, "%q", &name)
+
+		if name != current {
+			result = append(result, name)
+		}
+	}
+
+	return result, nil
 }

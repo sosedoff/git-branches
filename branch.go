@@ -11,10 +11,12 @@ var (
 	statusActive = "ACTIVE"
 	statusStale  = "STALE"
 	statusDead   = "DEAD"
+	statusMerged = "MERGED"
 
 	colorActive = color.GreenString
 	colorStale  = color.YellowString
 	colorDead   = color.RedString
+	colorMerged = color.HiCyanString
 
 	staleCommitsThreshold = 100
 	staleDaysThreshold    = 14
@@ -28,6 +30,7 @@ type branchInfo struct {
 	lastCommit    time.Time
 	commitsAhead  int
 	commitsBehind int
+	merged        bool
 }
 
 func (info branchInfo) strings() []string {
@@ -53,6 +56,9 @@ func (info branchInfo) isStale() bool {
 }
 
 func (info branchInfo) status() string {
+	if info.merged {
+		return colorMerged(statusMerged)
+	}
 	if info.isDead() {
 		return colorDead(statusDead)
 	}
