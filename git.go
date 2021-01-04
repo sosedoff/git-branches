@@ -16,7 +16,7 @@ func getHead() (string, error) {
 	return strings.TrimSpace(string(out)), nil
 }
 
-func parseBranchInfo(line string) (*branchInfo, error) {
+func parseBranchInfo(branch string, line string) (*branchInfo, error) {
 	var name, date string
 
 	if _, err := fmt.Sscanf(line, "branch=%q date=%q", &name, &date); err != nil {
@@ -33,12 +33,12 @@ func parseBranchInfo(line string) (*branchInfo, error) {
 		lastCommit: lastCommit,
 	}
 
-	behindOut, err := exec.Command("git", "rev-list", info.name+"..master").Output()
+	behindOut, err := exec.Command("git", "rev-list", info.name+".."+branch).Output()
 	if err != nil {
 		return nil, err
 	}
 
-	aheadOut, err := exec.Command("git", "rev-list", "master.."+info.name).Output()
+	aheadOut, err := exec.Command("git", "rev-list", branch+".."+info.name).Output()
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func getBranches() ([]branchInfo, error) {
 				return
 			}
 
-			info, err := parseBranchInfo(line)
+			info, err := parseBranchInfo(current, line)
 			if err != nil {
 				fatal(err)
 			}
