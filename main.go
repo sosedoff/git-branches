@@ -25,6 +25,10 @@ func renderBranches(branches []branchInfo, writer io.Writer) {
 }
 
 func main() {
+	if !checkRepo() {
+		fatal("must be in a git repo")
+	}
+
 	branches, err := getBranches()
 	if err != nil {
 		fatal(err)

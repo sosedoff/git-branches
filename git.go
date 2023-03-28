@@ -1,12 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
 	"sync"
 	"time"
 )
+
+func checkRepo() bool {
+	out := bytes.NewBuffer(nil)
+	cmd := exec.Command("git", "status")
+	cmd.Stderr = out
+	cmd.Run()
+
+	return !strings.Contains(out.String(), "not a git repository")
+}
 
 func getHead() (string, error) {
 	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
