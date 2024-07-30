@@ -25,7 +25,7 @@ func renderBranches(branches []branchInfo, writer io.Writer) {
 }
 
 func main() {
-	if !checkRepo() {
+	if !repositoryDetected() {
 		fatal("must be in a git repo")
 	}
 

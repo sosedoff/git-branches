@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func checkRepo() bool {
+func repositoryDetected() bool {
 	out := bytes.NewBuffer(nil)
 	cmd := exec.Command("git", "status")
 	cmd.Stderr = out
