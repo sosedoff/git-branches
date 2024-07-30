@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+type filterFunc func(string) bool
+
 func repositoryDetected() bool {
 	out := bytes.NewBuffer(nil)
 	cmd := exec.Command("git", "status")
@@ -59,7 +61,7 @@ func parseBranchInfo(branch string, line string) (*branchInfo, error) {
 	return info, nil
 }
 
-func getBranches() ([]branchInfo, error) {
+func getBranches(filter filterFunc) ([]branchInfo, error) {
 	current, err := getHead()
 	if err != nil {
 		return nil, err
@@ -84,7 +86,18 @@ func getBranches() ([]branchInfo, error) {
 	}
 
 	str := strings.TrimSpace(string(out))
-	lines := strings.Split(str, "\n")
+	lines := []string{}
+
+	for _, line := range strings.Split(str, "\n") {
+		if filter == nil {
+			lines = append(lines, line)
+			continue
+		}
+
+		if filter(line) {
+			lines = append(lines, line)
+		}
+	}
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(lines))

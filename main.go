@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/olekukonko/tablewriter"
 )
@@ -14,6 +15,11 @@ func fatal(err interface{}) {
 }
 
 func renderBranches(branches []branchInfo, writer io.Writer) {
+	if len(branches) == 0 {
+		fmt.Fprintln(writer, "No branches found")
+		return
+	}
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Behind", "Ahead", "Last Commit", "Status"})
 
@@ -29,9 +35,19 @@ func main() {
 		fatal("must be in a git repo")
 	}
 
-	branches, err := getBranches()
+	var filterFn filterFunc
+
+	args := os.Args[1:]
+	if len(args) > 0 {
+		filterFn = func(input string) bool {
+			return strings.Contains(input, args[0])
+		}
+	}
+
+	branches, err := getBranches(filterFn)
 	if err != nil {
 		fatal(err)
 	}
+
 	renderBranches(branches, os.Stdout)
 }
