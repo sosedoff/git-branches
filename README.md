@@ -5,7 +5,7 @@ A small tool to show current status of the git repository
 ## Install
 
 ```bash
-go get github.com/sosedoff/git-branches
+go install github.com/sosedoff/git-branches@latest
 ```
 
 ## Example
