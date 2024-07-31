@@ -9,27 +9,6 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func fatal(err interface{}) {
-	fmt.Println("error:", err)
-	os.Exit(1)
-}
-
-func renderBranches(branches []branchInfo, writer io.Writer) {
-	if len(branches) == 0 {
-		fmt.Fprintln(writer, "No branches found")
-		return
-	}
-
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Name", "Behind", "Ahead", "Last Commit", "Status"})
-
-	for _, branch := range branches {
-		table.Append(branch.strings())
-	}
-
-	table.Render()
-}
-
 func main() {
 	if !repositoryDetected() {
 		fatal("must be in a git repo")
@@ -50,4 +29,25 @@ func main() {
 	}
 
 	renderBranches(branches, os.Stdout)
+}
+
+func fatal(err interface{}) {
+	fmt.Println("error:", err)
+	os.Exit(1)
+}
+
+func renderBranches(branches []branchInfo, writer io.Writer) {
+	if len(branches) == 0 {
+		fmt.Fprintln(writer, "No branches found")
+		return
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name", "Behind", "Ahead", "Last Commit", "Status"})
+
+	for _, branch := range branches {
+		table.Append(branch.strings())
+	}
+
+	table.Render()
 }
